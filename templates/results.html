@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Results - Quiz App{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between">
+    <button class="btn btn-secondary" onclick="window.location.href='/user/dashboard'">Back</button>
+    <button class="btn btn-secondary" onclick="logoutUser()">Logout</button>
+  </div>
+  <h2 class="text-center mt-3">Your Test History</h2>
+  <div class="table-responsive mt-4">
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Session ID</th>
+          <th>Score</th>
+          <th>Total Questions</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="results-table">
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Quiz App{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-secondary btn-lg" onclick="logoutUser()">Logout</button>
+  </div>
+  <div class="text-center">
+    <h2>User Dashboard</h2>
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <button class="btn btn-primary btn-lg" onclick="window.location.href='/quiz/take'">Take New Test</button>
+      <button class="btn btn-info btn-lg" onclick="window.location.href='/quiz/user_results'">View Previous Results</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

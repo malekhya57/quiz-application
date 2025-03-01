@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Manage Questions - Admin{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-secondary" onclick="window.location.href='/admin/dashboard'">Back to Dashboard</button>
+      <div>
+          <button class="btn btn-secondary me-2" onclick="window.location.href='/admin/logout'">Logout</button>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h4 class="card-title">Add New Question</h4>
+          <div class="mb-3">
+            <input type="text" id="new_question_text" class="form-control" placeholder="Question Text">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="new_option_a" class="form-control" placeholder="Option A">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="new_option_b" class="form-control" placeholder="Option B">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="new_option_c" class="form-control" placeholder="Option C">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="new_option_d" class="form-control" placeholder="Option D">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="new_correct_answer" class="form-control" placeholder="Correct Answer (A, B, C, or D)">
+          </div>
+          <button class="btn btn-success" onclick="addQuestion()">Add Question</button>
+        </div>
+      </div>
+    </div>
+    <!-- Right Column: Existing Questions (Scrollable vertically only) -->
+    <div class="col-md-9">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+          <h4 class="card-title">Existing Questions</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Question</th>
+                  <th>Options</th>
+                  <th>Correct Answer</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for question in questions %}
+                <tr id="question-row-{{ question.id }}">
+                  <td>{{ question.id }}</td>
+                  <td>{{ question.question_text }}</td>
+                  <td>
+                    A: {{ question.option_a }}<br>
+                    B: {{ question.option_b }}<br>
+                    C: {{ question.option_c }}<br>
+                    D: {{ question.option_d }}
+                  </td>
+                  <td>{{ question.correct_answer }}</td>
+                  <td><button class="btn btn-danger btn-sm" onclick="deleteQuestion({{ question.id }})">Delete</button></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
