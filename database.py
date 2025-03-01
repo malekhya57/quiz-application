@@ -1,42 +1,54 @@
-from flask import Flask
 from config import SQLALCHEMY_DATABASE_URI
-from models import db, Question
+from werkzeug.security import generate_password_hash
+from models import db, Admin, Question
+
+def seed_admin():
+    if not Admin.query.filter_by(username="admin").first():
+        new_admin = Admin(username="admin", password=generate_password_hash("admin"))
+        db.session.add(new_admin)
+        db.session.commit()
+        print("✅ Admin seeded with username 'admin' and password 'admin'.")
 
 def init_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
+    app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("SQLALCHEMY_DATABASE_URI")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
     with app.app_context():
         db.create_all()
-        seed_questions()  # Add this line to populate DB
+        seed_questions()  
+        seed_admin()      
 
 def seed_questions():
-    """Populate database with 20 general knowledge questions if empty."""
-    if Question.query.count() == 0:  # Only insert if DB is empty
+    """Populate database with 25 simple questions if empty."""
+    if Question.query.count() == 0:
         sample_questions = [
-            {"question_text": "What is the capital of France?", "option_a": "Berlin", "option_b": "Madrid", "option_c": "Paris", "option_d": "Rome", "correct_answer": "C"},
-            {"question_text": "Which planet is known as the Red Planet?", "option_a": "Earth", "option_b": "Mars", "option_c": "Jupiter", "option_d": "Saturn", "correct_answer": "B"},
-            {"question_text": "Who wrote 'Hamlet'?", "option_a": "Shakespeare", "option_b": "Hemingway", "option_c": "Tolkien", "option_d": "Austen", "correct_answer": "A"},
-            {"question_text": "What is the largest ocean on Earth?", "option_a": "Atlantic", "option_b": "Indian", "option_c": "Pacific", "option_d": "Arctic", "correct_answer": "C"},
-            {"question_text": "What is the hardest natural substance on Earth?", "option_a": "Gold", "option_b": "Iron", "option_c": "Diamond", "option_d": "Quartz", "correct_answer": "C"},
-            {"question_text": "Which is the longest river in the world?", "option_a": "Amazon", "option_b": "Nile", "option_c": "Yangtze", "option_d": "Mississippi", "correct_answer": "B"},
-            {"question_text": "What is the currency of Japan?", "option_a": "Yen", "option_b": "Won", "option_c": "Peso", "option_d": "Euro", "correct_answer": "A"},
-            {"question_text": "How many continents are there?", "option_a": "5", "option_b": "6", "option_c": "7", "option_d": "8", "correct_answer": "C"},
-            {"question_text": "What gas do plants absorb during photosynthesis?", "option_a": "Oxygen", "option_b": "Carbon Dioxide", "option_c": "Hydrogen", "option_d": "Nitrogen", "correct_answer": "B"},
-            {"question_text": "Which country is famous for pizza and pasta?", "option_a": "France", "option_b": "Germany", "option_c": "Italy", "option_d": "Spain", "correct_answer": "C"},
-            {"question_text": "Who painted the Mona Lisa?", "option_a": "Van Gogh", "option_b": "Picasso", "option_c": "Leonardo da Vinci", "option_d": "Rembrandt", "correct_answer": "C"},
-            {"question_text": "Which animal is known as the King of the Jungle?", "option_a": "Tiger", "option_b": "Lion", "option_c": "Elephant", "option_d": "Cheetah", "correct_answer": "B"},
-            {"question_text": "What is the national flower of Japan?", "option_a": "Tulip", "option_b": "Cherry Blossom", "option_c": "Rose", "option_d": "Orchid", "correct_answer": "B"},
-            {"question_text": "Which planet has the most moons?", "option_a": "Saturn", "option_b": "Jupiter", "option_c": "Mars", "option_d": "Neptune", "correct_answer": "A"},
-            {"question_text": "What is the largest land animal?", "option_a": "Elephant", "option_b": "Giraffe", "option_c": "Rhino", "option_d": "Hippo", "correct_answer": "A"},
-            {"question_text": "Which country is known as the Land of the Rising Sun?", "option_a": "China", "option_b": "Japan", "option_c": "Korea", "option_d": "Thailand", "correct_answer": "B"},
-            {"question_text": "What is the smallest country in the world?", "option_a": "Monaco", "option_b": "Vatican City", "option_c": "San Marino", "option_d": "Liechtenstein", "correct_answer": "B"},
-            {"question_text": "Which chemical element has the symbol O?", "option_a": "Oxygen", "option_b": "Gold", "option_c": "Osmium", "option_d": "Olbium", "correct_answer": "A"},
-            {"question_text": "How many sides does a hexagon have?", "option_a": "4", "option_b": "5", "option_c": "6", "option_d": "7", "correct_answer": "C"},
-            {"question_text": "What is the capital of Australia?", "option_a": "Sydney", "option_b": "Canberra", "option_c": "Melbourne", "option_d": "Perth", "correct_answer": "B"},
+            {"question_text": "What is 2 + 2?", "option_a": "4", "option_b": "5", "option_c": "3", "option_d": "6", "correct_answer": "A"},
+            {"question_text": "What is 10 - 3?", "option_a": "5", "option_b": "7", "option_c": "6", "option_d": "8", "correct_answer": "B"},
+            {"question_text": "What is 5 x 3?", "option_a": "8", "option_b": "15", "option_c": "10", "option_d": "20", "correct_answer": "B"},
+            {"question_text": "What is 16 ÷ 4?", "option_a": "2", "option_b": "3", "option_c": "4", "option_d": "5", "correct_answer": "C"},
+            {"question_text": "What is the square of 3?", "option_a": "6", "option_b": "9", "option_c": "3", "option_d": "12", "correct_answer": "B"},
+            {"question_text": "If all roses are flowers and some flowers fade quickly, can we say some roses fade quickly?", "option_a": "Yes", "option_b": "No", "option_c": "Maybe", "option_d": "Not enough info", "correct_answer": "D"},
+            {"question_text": "Which number logically follows this series: 2, 4, 6, 8, ?", "option_a": "9", "option_b": "10", "option_c": "11", "option_d": "12", "correct_answer": "B"},
+            {"question_text": "What comes next in the pattern: O, T, T, F, F, S, S, ?", "option_a": "E", "option_b": "N", "option_c": "T", "option_d": "M", "correct_answer": "A"},
+            {"question_text": "Which one of the five is least like the other four? Dog, Cat, Snake, Hamster, Rabbit", "option_a": "Dog", "option_b": "Snake", "option_c": "Cat", "option_d": "Rabbit", "correct_answer": "B"},
+            {"question_text": "What is the next number in the sequence: 1, 1, 2, 3, 5, 8, ?", "option_a": "10", "option_b": "11", "option_c": "13", "option_d": "15", "correct_answer": "C"},
+            {"question_text": "What is the capital city of France?", "option_a": "London", "option_b": "Berlin", "option_c": "Paris", "option_d": "Madrid", "correct_answer": "C"},
+            {"question_text": "Which planet is known as the Red Planet?", "option_a": "Mars", "option_b": "Venus", "option_c": "Jupiter", "option_d": "Saturn", "correct_answer": "A"},
+            {"question_text": "What is the boiling point of water (in °C)?", "option_a": "90", "option_b": "95", "option_c": "100", "option_d": "105", "correct_answer": "C"},
+            {"question_text": "What is the largest mammal in the world?", "option_a": "Elephant", "option_b": "Blue Whale", "option_c": "Giraffe", "option_d": "Hippopotamus", "correct_answer": "B"},
+            {"question_text": "Which ocean is the largest?", "option_a": "Atlantic", "option_b": "Indian", "option_c": "Pacific", "option_d": "Arctic", "correct_answer": "C"},
+            {"question_text": "In which continent is Brazil located?", "option_a": "Asia", "option_b": "South America", "option_c": "Africa", "option_d": "Europe", "correct_answer": "B"},
+            {"question_text": "Who wrote the play 'Romeo and Juliet'?", "option_a": "Charles Dickens", "option_b": "William Shakespeare", "option_c": "Leo Tolstoy", "option_d": "Mark Twain", "correct_answer": "B"},
+            {"question_text": "What is the chemical symbol for water?", "option_a": "H2O", "option_b": "O2", "option_c": "CO2", "option_d": "HO", "correct_answer": "A"},
+            {"question_text": "How many days are there in a leap year?", "option_a": "365", "option_b": "366", "option_c": "364", "option_d": "367", "correct_answer": "B"},
+            {"question_text": "Which gas do plants absorb from the atmosphere?", "option_a": "Oxygen", "option_b": "Hydrogen", "option_c": "Carbon Dioxide", "option_d": "Nitrogen", "correct_answer": "C"},
+            {"question_text": "Which instrument has 88 keys?", "option_a": "Guitar", "option_b": "Piano", "option_c": "Violin", "option_d": "Flute", "correct_answer": "B"},
+            {"question_text": "Which is the smallest prime number?", "option_a": "1", "option_b": "2", "option_c": "3", "option_d": "5", "correct_answer": "B"},
+            {"question_text": "What is the main language spoken in Spain?", "option_a": "French", "option_b": "German", "option_c": "Spanish", "option_d": "Italian", "correct_answer": "C"},
+            {"question_text": "Which is the tallest mountain in the world?", "option_a": "K2", "option_b": "Kangchenjunga", "option_c": "Mount Everest", "option_d": "Lhotse", "correct_answer": "C"}
         ]
-
         for q in sample_questions:
             new_question = Question(**q)
             db.session.add(new_question)
         db.session.commit()
-        print("✅ Database seeded with 20 questions.")
+        print("✅ Database seeded with 25 simple questions.")
