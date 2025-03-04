@@ -31,7 +31,7 @@ jobs:
       # 4. Initialize / Migrate Database (creates/updates instance/quiz.db)
       - name: Initialize / Migrate Database
         run: |
-          python -c "from app import init_db; init_db()"
+          python -c "from app import app, init_db; init_db(app)"
 
       # 5. Run tests (if any exist)
       - name: Run tests
