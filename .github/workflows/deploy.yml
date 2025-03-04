@@ -5,22 +5,26 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
+      # 1. Checkout code with full history and persisted credentials
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           persist-credentials: true
+          fetch-depth: 0
 
-      # 2. Set up Python 3.11
-      - name: Set up Python 3.11
+      # 2. Set up Python 3.10
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       # 3. Install dependencies
       - name: Install dependencies
@@ -28,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4. Initialize / Migrate Database (creates/updates instance/quiz.db)
+      # 4. Initialize / Migrate Database
       - name: Initialize / Migrate Database
         run: |
           python -c "from app import app, init_db; init_db(app)"
@@ -53,7 +57,7 @@ jobs:
             echo "No changes in instance/quiz.db."
           fi
 
-      # 7. Trigger a deployment on Render using the API
+      # 7. Trigger a deployment on Render via the API
       - name: Trigger Render Deploy
         env:
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
