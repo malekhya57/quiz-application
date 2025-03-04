@@ -10,9 +10,10 @@ def seed_admin():
         print("✅ Admin seeded with username 'admin' and password 'admin'.")
 
 def init_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("SQLALCHEMY_DATABASE_URI")
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db.init_app(app)
+    if not app.extensions.get('sqlalchemy'):
+        app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("SQLALCHEMY_DATABASE_URI")
+        app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+        db.init_app(app)
     with app.app_context():
         db.create_all()
         seed_questions()  
