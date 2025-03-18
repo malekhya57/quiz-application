@@ -19,7 +19,6 @@ body {
     padding-bottom: 50px; 
 }
 
-
 .navbar {
     background: linear-gradient(90deg, var(--accent-blue), var(--primary-purple));
     border-bottom: 2px solid var(--dark-black);

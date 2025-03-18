@@ -35,7 +35,6 @@
         </div>
       </div>
     </div>
-    <!-- Right Column: Existing Questions (Scrollable vertically only) -->
     <div class="col-md-9">
       <div class="card" style="max-width: 800px; margin: 0 auto;">
         <div class="card-body" style="max-height: 600px; overflow-y: auto;">
@@ -53,18 +52,21 @@
               </thead>
               <tbody>
                 {% for question in questions %}
-                <tr id="question-row-{{ question.id }}">
-                  <td>{{ question.id }}</td>
-                  <td>{{ question.question_text }}</td>
-                  <td>
-                    A: {{ question.option_a }}<br>
-                    B: {{ question.option_b }}<br>
-                    C: {{ question.option_c }}<br>
-                    D: {{ question.option_d }}
-                  </td>
-                  <td>{{ question.correct_answer }}</td>
-                  <td><button class="btn btn-danger btn-sm" onclick="deleteQuestion({{ question.id }})">Delete</button></td>
-                </tr>
+                  <tr id="question-row-{{ question.id }}">
+                    <td>{{ question.id }}</td>
+                    <td>{{ question.question_text }}</td>
+                    <td>
+                        A: {{ question.option_a }}<br>
+                        B: {{ question.option_b }}<br>
+                        C: {{ question.option_c }}<br>
+                        D: {{ question.option_d }}
+                    </td>
+                    <td>{{ question.correct_answer }}</td>
+                    <td>
+                      <!-- Wrap the ID with quotes to make it a string in the JS function -->
+                      <button class="btn btn-danger btn-sm" onclick="deleteQuestion('{{ question.id }}')">Delete</button>
+                    </td>
+                  </tr>
                 {% endfor %}
               </tbody>
             </table>

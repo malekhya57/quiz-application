@@ -34,8 +34,10 @@ def login():
     if not data.get("username") or not data.get("password"):
         return jsonify({"message": "Username and password required"}), 400
     user = Admin.query.filter_by(username=data["username"]).first() or User.query.filter_by(username=data["username"]).first()
+
     if user and check_password_hash(user.password, data["password"]):
         role = "admin" if isinstance(user, Admin) else "user"
         token = create_access_token(identity={"id": user.id, "role": role}, expires_delta=timedelta(hours=24))
         return jsonify({"access_token": token, "role": role}), 200
-    return jsonify({"message": "Invalid credentials"}), 401
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401

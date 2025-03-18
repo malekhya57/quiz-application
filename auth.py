@@ -28,10 +28,8 @@ def register_user():
 def login():
     data = request.json
     user = Admin.query.filter_by(username=data["username"]).first() or User.query.filter_by(username=data["username"]).first()
-
     if user and check_password_hash(user.password, data["password"]):
         token = create_access_token(identity=str(user.id), expires_delta=timedelta(hours=24)) 
 
         return jsonify({"access_token": token}), 200
-
     return jsonify({"message": "Invalid credentials"}), 401

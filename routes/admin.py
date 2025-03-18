@@ -24,7 +24,8 @@ def admin_dashboard():
 def manage_questions():
     if not session.get("admin_logged_in"):
         return redirect(url_for("admin.admin_login"))
-    questions = Question.query.all()
+    
+    questions = Question.query.all()  
     return render_template("admin_questions.html", questions=questions)
 
 @admin_blueprint.route("/add_question", methods=["POST"])
@@ -53,12 +54,16 @@ def add_question():
 def delete_question(question_id):
     if not session.get("admin_logged_in"):
         return jsonify({"message": "Unauthorized"}), 403
+    
     question = Question.query.get(question_id)
     if not question:
         return jsonify({"message": "Question not found"}), 404
+    
     db.session.delete(question)
     db.session.commit()
+    
     return jsonify({"message": "Question deleted successfully"}), 200
+
 
 @admin_blueprint.route("/login", methods=["GET", "POST"])
 def admin_login():

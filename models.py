@@ -20,7 +20,7 @@ class Question(db.Model):
     option_b = db.Column(db.String(200), nullable=False)
     option_c = db.Column(db.String(200), nullable=False)
     option_d = db.Column(db.String(200), nullable=False)
-    correct_answer = db.Column(db.String(1), nullable=False)  # "A", "B", "C", or "D"
+    correct_answer = db.Column(db.String(1), nullable=False)
 
 class UserAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

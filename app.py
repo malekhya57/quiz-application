@@ -6,6 +6,11 @@ from models import db
 from routes.auth import auth_blueprint
 from routes.quiz import quiz_blueprint
 from routes.admin import admin_blueprint
+import os
+from flask_cors import CORS
+
+
+
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
@@ -14,17 +19,14 @@ app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
+CORS(app)
 init_db(app)
 
-
 jwt = JWTManager(app)
-
 
 app.register_blueprint(auth_blueprint, url_prefix="/auth")
 app.register_blueprint(quiz_blueprint, url_prefix="/quiz")
 app.register_blueprint(admin_blueprint, url_prefix="/admin")
-
 
 @app.route("/")
 def home():
@@ -55,4 +57,4 @@ def admin_login():
     return render_template("admin_login.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",5000)),debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",5001)), debug=True)
