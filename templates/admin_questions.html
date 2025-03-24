@@ -3,10 +3,8 @@
 {% block content %}
 <div class="container">
   <div class="d-flex justify-content-between mb-3">
-      <button class="btn btn-secondary" onclick="window.location.href='/admin/dashboard'">Back to Dashboard</button>
-      <div>
-          <button class="btn btn-secondary me-2" onclick="window.location.href='/admin/logout'">Logout</button>
-      </div>
+      <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+      <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-secondary">Logout</a>
   </div>
   <div class="row">
     <div class="col-md-3">
@@ -63,8 +61,7 @@
                     </td>
                     <td>{{ question.correct_answer }}</td>
                     <td>
-                      <!-- Wrap the ID with quotes to make it a string in the JS function -->
-                      <button class="btn btn-danger btn-sm" onclick="deleteQuestion('{{ question.id }}')">Delete</button>
+                      <button class="btn btn-danger btn-sm" onclick="deleteQuestion({{ question.id }})">Delete</button>
                     </td>
                   </tr>
                 {% endfor %}

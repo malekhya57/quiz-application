@@ -3,13 +3,24 @@
 {% block content %}
 <div class="card">
   <div class="card-body">
+      <!-- Flash messages block -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
       <h3 class="card-title text-center mb-3">User Login</h3>
-      <form onsubmit="event.preventDefault(); login();">
+      <form method="POST" action="{{ url_for('auth.login_page') }}">
           <div class="mb-3">
-              <input type="text" name="username" id="login_username" class="form-control" placeholder="Username" required>
+              <input type="text" name="username" class="form-control" placeholder="Username" required>
           </div>
           <div class="mb-3">
-              <input type="password" name="password" id="login_password" class="form-control" placeholder="Password" required>
+              <input type="password" name="password" class="form-control" placeholder="Password" required>
           </div>
           <button class="btn btn-primary w-100" type="submit">Login</button>
       </form>

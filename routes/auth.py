@@ -1,43 +1,50 @@
-from datetime import timedelta
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask import Blueprint, request, render_template, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Admin, User
+from models import db, User
 
 auth_blueprint = Blueprint("auth", __name__)
 
-@auth_blueprint.route("/register_admin", methods=["POST"])
-def register_admin():
-    data = request.json
-    if not data.get("username") or not data.get("password"):
-        return jsonify({"message": "Username and password required"}), 400
-    hashed_password = generate_password_hash(data["password"])
-    new_admin = Admin(username=data["username"], password=hashed_password)
-    db.session.add(new_admin)
-    db.session.commit()
-    return jsonify({"message": "Admin registered successfully"}), 201
+@auth_blueprint.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if not username or not password:
+            flash("Username and password required")
+            return redirect(url_for("auth.register"))
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists")
+            return redirect(url_for("auth.register"))
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        # Return an HTML snippet with JavaScript alert and redirect
+        return '''
+            <script>
+                alert("User registered successfully. Please log in.");
+                window.location.href="/auth/login";
+            </script>
+        '''
+    return render_template("register.html")
 
-@auth_blueprint.route("/register_user", methods=["POST"])
-def register_user():
-    data = request.json
-    if not data.get("username") or not data.get("password"):
-        return jsonify({"message": "Username and password required"}), 400
-    hashed_password = generate_password_hash(data["password"])
-    new_user = User(username=data["username"], password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User registered successfully"}), 201
+@auth_blueprint.route("/login", methods=["GET", "POST"])
+def login_page():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session["user_id"] = user.id
+            session["username"] = user.username
+            return redirect(url_for("user_dashboard"))
+        else:
+            flash("Invalid credentials")
+            return render_template("login.html")
+    return render_template("login.html")
 
-@auth_blueprint.route("/login", methods=["POST"])
-def login():
-    data = request.json
-    if not data.get("username") or not data.get("password"):
-        return jsonify({"message": "Username and password required"}), 400
-    user = Admin.query.filter_by(username=data["username"]).first() or User.query.filter_by(username=data["username"]).first()
-
-    if user and check_password_hash(user.password, data["password"]):
-        role = "admin" if isinstance(user, Admin) else "user"
-        token = create_access_token(identity={"id": user.id, "role": role}, expires_delta=timedelta(hours=24))
-        return jsonify({"access_token": token, "role": role}), 200
-    else:
-        return jsonify({"message": "Invalid credentials"}), 401
+@auth_blueprint.route("/logout")
+def logout():
+    session.pop("user_id", None)
+    session.pop("username", None)
+    return redirect(url_for("auth.login_page"))

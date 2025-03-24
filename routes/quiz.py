@@ -1,15 +1,16 @@
 import random
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, Question, UserAnswer, TestSession
+from flask import Blueprint, request, jsonify, session
+from models import db, Question, Result
+from decorators import login_required
 
 quiz_blueprint = Blueprint("quiz", __name__)
 
 @quiz_blueprint.route("/get_random_questions", methods=["GET"])
-@jwt_required()
+@login_required
 def get_random_questions():
     questions = Question.query.all()
-    selected = random.sample(questions, 15) if len(questions) >= 15 else questions
+    # Select 10 questions (or all if fewer)
+    selected = random.sample(questions, 10) if len(questions) >= 10 else questions
     result = []
     for q in selected:
         result.append({
@@ -17,50 +18,45 @@ def get_random_questions():
             "question_text": q.question_text,
             "options": {"A": q.option_a, "B": q.option_b, "C": q.option_c, "D": q.option_d}
         })
-    return jsonify(result), 200
+    return jsonify(result)
 
 @quiz_blueprint.route("/submit_quiz", methods=["POST"])
-@jwt_required()
+@login_required
 def submit_quiz():
-    data = request.json  
-    user_identity = get_jwt_identity()
-    user_id = user_identity["id"]
-    if not isinstance(data, list):
-        return jsonify({"message": "Invalid data format, expected a list"}), 400
+    payload = request.get_json()
+    answers = payload.get("answers")
+    total = payload.get("total")
+    
+    if not isinstance(answers, list):
+        return jsonify({"message": "Invalid data format, expected a list of answers"}), 400
 
     score = 0
-    for answer in data:
+    for answer in answers:
         question = Question.query.get(answer.get("question_id"))
         if not question:
             continue
-        selected = answer.get("selected_answer")
-        is_correct = (question.correct_answer == selected)
-        if is_correct:
+        if question.correct_answer == answer.get("selected_answer"):
             score += 1
-        ua = UserAnswer(
-            user_id=user_id,
-            question_id=question.id,
-            selected_answer=selected,
-            is_correct=is_correct
-        )
-        db.session.add(ua)
-    test_session = TestSession(user_id=user_id, score=score, total_questions=len(data))
-    db.session.add(test_session)
-    db.session.commit()
-    return jsonify({"score": score, "total": len(data)}), 200
 
-@quiz_blueprint.route("/results", methods=["GET"])
-@jwt_required()
-def get_results():
-    user_identity = get_jwt_identity()
-    user_id = user_identity["id"]
-    sessions = TestSession.query.filter_by(user_id=user_id).all()
-    results = []
-    for s in sessions:
-        results.append({
-            "id": s.id,
-            "score": s.score,
-            "total": s.total_questions,
-            "timestamp": s.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    # Save the result using the provided total number of questions
+    new_result = Result(user_id=session["user_id"], score=score, total_questions=total)
+    db.session.add(new_result)
+    db.session.commit()
+
+    return jsonify({"score": score, "total": total})
+
+
+@quiz_blueprint.route("/results_data", methods=["GET"])
+@login_required
+def get_results_data():
+    user_id = session["user_id"]
+    results = Result.query.filter_by(user_id=user_id).all()
+    output = []
+    for r in results:
+        output.append({
+            "id": r.id,
+            "score": r.score,
+            "total": r.total_questions,
+            "timestamp": r.timestamp.strftime("%Y-%m-%d %H:%M:%S")
         })
-    return jsonify(results), 200
+    return jsonify(output)

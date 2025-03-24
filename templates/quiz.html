@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container mt-4">
   <div class="d-flex justify-content-between">
-    <button class="btn btn-secondary" onclick="window.location.href='/user/dashboard'">Back</button>
-    <button class="btn btn-secondary" onclick="logoutUser()">Logout</button>
+    <a href="/user/dashboard" class="btn btn-secondary">Back</a>
+    <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">Logout</a>
   </div>
   <h2 class="text-center mt-3">Quiz</h2>
   <div id="quiz-content">

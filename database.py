@@ -1,6 +1,5 @@
-from config import SQLALCHEMY_DATABASE_URI
-from werkzeug.security import generate_password_hash
 from models import db, Admin, Question
+from werkzeug.security import generate_password_hash
 
 def seed_admin():
     if not Admin.query.filter_by(username="admin").first():
@@ -8,16 +7,6 @@ def seed_admin():
         db.session.add(new_admin)
         db.session.commit()
         print("✅ Admin seeded with username 'admin' and password 'admin'.")
-
-def init_db(app):
-    if not app.extensions.get('sqlalchemy'):
-        app.config["SQLALCHEMY_DATABASE_URI"] = app.config.get("SQLALCHEMY_DATABASE_URI")
-        app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-        db.init_app(app)
-    with app.app_context():
-        db.create_all()
-        seed_questions()  
-        seed_admin()      
 
 def seed_questions():
     """Populate database with 25 simple questions if empty."""
@@ -53,3 +42,10 @@ def seed_questions():
             db.session.add(new_question)
         db.session.commit()
         print("✅ Database seeded with 25 simple questions.")
+
+def init_db(app):
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+        seed_questions()  
+        seed_admin() 

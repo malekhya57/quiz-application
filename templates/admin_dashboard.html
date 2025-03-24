@@ -4,14 +4,14 @@
 <div class="container">
   <h2 class="text-center mb-4">Admin Dashboard</h2>
   <div class="d-flex justify-content-center mb-4">
-    <button class="btn btn-primary me-2" onclick="window.location.href='/admin/questions'">Manage Questions</button>
-    <button class="btn btn-secondary" onclick="window.location.href='/admin/logout'">Logout</button>
+    <a href="{{ url_for('admin.manage_questions') }}" class="btn btn-primary me-2">Manage Questions</a>
+    <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-secondary">Logout</a>
   </div>
   <div class="table-responsive">
     <table class="table table-bordered">
       <thead class="table-light">
         <tr>
-          <th>Session ID</th>
+          <th>Result ID</th>
           <th>Username</th>
           <th>Score</th>
           <th>Total Questions</th>
@@ -21,7 +21,7 @@
       <tbody>
         {% for result in results %}
         <tr>
-          <td>{{ result.session_id }}</td>
+          <td>{{ result.result_id }}</td>
           <td>{{ result.username }}</td>
           <td>{{ result.score }}</td>
           <td>{{ result.total }}</td>
